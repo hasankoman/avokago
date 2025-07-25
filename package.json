@@ -1,0 +1,16 @@
+{
+  "name": "avokago",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev-app": "cd avokago-app && npm run dev",
+    "dev-landing": "cd avokago-landing && npm run dev",
+    "build-app": "cd avokago-app && npm run build",
+    "build-landing": "cd avokago-landing && npm run build",
+    "start-app": "cd avokago-app && npm run start",
+    "start-landing": "cd avokago-landing && npm run start",
+    "lint-app": "cd avokago-app && npm run lint",
+    "lint-landing": "cd avokago-landing && npm run lint"
+  },
+  "description": "Avokago project workspace with multiple Next.js applications"
+}
