@@ -34,13 +34,13 @@ export default function Home() {
             <span className="text-[#357A38] font-bold text-xl">avokaGo</span>
           </motion.div>
 
-          <Link href="/onboarding">
+          <Link href="/auth/signin">
             <motion.button
               className="btn-primary"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              Başlayın
+              Giriş Yap
             </motion.button>
           </Link>
         </div>
@@ -127,7 +127,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            <Link href="/onboarding">
+            <Link href="/auth/signin">
               <motion.button
                 className="group btn-primary text-lg px-8 py-4"
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -135,7 +135,7 @@ export default function Home() {
               >
                 <span className="flex items-center justify-center space-x-2">
                   <Brain className="w-5 h-5" />
-                  <span>Kişiliğimi Keşfet</span>
+                  <span>Başlayın</span>
                   <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
                 </span>
               </motion.button>

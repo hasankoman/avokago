@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -13,15 +16,19 @@ export const metadata: Metadata = {
     "Kullanıcının kişisel yanıtları, alışkanlıkları ve hedefleri üzerinden onun için en uygun seyahati kişiselleştirilmiş bir asistan gibi planlar.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="tr">
       <body className={`${spaceGrotesk.className} antialiased`}>
-        {children}
+        <Providers session={session}>
+          {children}
+        </Providers>
       </body>
     </html>
   );
