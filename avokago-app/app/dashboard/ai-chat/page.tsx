@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useSession } from "next-auth/react";
 import {
   Send,
   Bot,
@@ -113,13 +114,15 @@ const mockDestinations = [
 
 // API endpoint for AI responses
 const WEBHOOK_URL =
-  "http://localhost:5678/webhook/c49db7d9-4adc-4c5e-9904-cb0cd00390e6";
+  //"http://localhost:5678/webhook/c49db7d9-4adc-4c5e-9904-cb0cd00390e6";
+  "http://localhost:5678/webhook-test/c49db7d9-4adc-4c5e-9904-cb0cd00390e6";
 
 // Get AI response from webhook
 const getAIResponse = async (
   userMessage: string,
   userType: string = "peace",
-  conversationHistory: Message[] = []
+  conversationHistory: Message[] = [],
+  userId?: string
 ): Promise<Message> => {
   try {
     const profileType = profileTypes[userType as keyof typeof profileTypes];
@@ -129,12 +132,15 @@ const getAIResponse = async (
       message: userMessage,
       userType: userType,
       profileType: profileType,
+      userId: userId,
       conversationHistory: conversationHistory.map((msg) => ({
         type: msg.type,
         content: msg.content,
         timestamp: msg.timestamp.toISOString(),
       })),
     };
+
+    console.log("Sending payload to webhook:", payload);
 
     const response = await fetch(WEBHOOK_URL, {
       method: "POST",
@@ -150,7 +156,7 @@ const getAIResponse = async (
 
     const data = await response.json();
 
-    console.log(data);
+    console.log("Received response from webhook:", data);
 
     return {
       id: Date.now().toString(),
@@ -188,6 +194,7 @@ const getAIResponse = async (
 };
 
 export default function AIChat() {
+  const { data: session, status } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -196,6 +203,50 @@ export default function AIChat() {
 
   const profileType = profileTypes[userProfile as keyof typeof profileTypes];
   const ProfileIcon = profileType.icon;
+
+  // Show loading while session is being loaded
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#F9F9F4] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#357A38] mx-auto mb-4"></div>
+          <p className="text-[#6B4F1D]">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to sign in if not authenticated
+  if (status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#F9F9F4] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[#6B4F1D] mb-4">Lütfen giriş yapın</p>
+          <Link href="/auth/signin" className="text-[#357A38] hover:underline">
+            Giriş Yap
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Debug: Show session info if user ID is missing
+  if (session && !session.user?.id) {
+    console.error("Session exists but user ID is missing:", session);
+    return (
+      <div className="min-h-screen bg-[#F9F9F4] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[#6B4F1D] mb-4">
+            Oturum sorunu: Kullanıcı ID'si bulunamadı
+          </p>
+          <p className="text-xs text-gray-500 mb-4">Konsolu kontrol edin</p>
+          <Link href="/auth/signin" className="text-[#357A38] hover:underline">
+            Tekrar Giriş Yap
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     // Initial greeting message
@@ -222,6 +273,18 @@ export default function AIChat() {
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
+    console.log("Session:", session);
+    console.log("User:", session?.user);
+    console.log("User ID:", session?.user?.id);
+
+    // Check if user is authenticated
+    if (!session?.user?.id) {
+      console.error("User not authenticated or user ID not available");
+      console.error("Session status:", status);
+      console.error("Session object:", session);
+      return;
+    }
+
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -236,7 +299,12 @@ export default function AIChat() {
 
     try {
       // Get AI response from webhook
-      const aiResponse = await getAIResponse(content, userProfile, messages);
+      const aiResponse = await getAIResponse(
+        content,
+        userProfile,
+        messages,
+        session.user.id
+      );
       setMessages((prev) => [...prev, aiResponse]);
     } catch (error) {
       console.error("Error getting AI response:", error);
