@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   LayoutDashboard,
   Map,
@@ -27,32 +27,38 @@ const menuItems = [
     icon: LayoutDashboard,
     label: "Dashboard",
     href: "/dashboard",
+    exists: true,
   },
   {
     icon: Map,
     label: "Keşfet",
     href: "/dashboard/explore",
     badge: "5",
+    exists: false,
   },
   {
     icon: Calendar,
     label: "Seyahat Planları",
     href: "/dashboard/plans",
+    exists: false,
   },
   {
     icon: Heart,
     label: "Favoriler",
     href: "/dashboard/favorites",
+    exists: false,
   },
   {
     icon: Users,
     label: "Topluluk",
     href: "/dashboard/community",
+    exists: false,
   },
   {
     icon: Bot,
     label: "AI Asistan",
     href: "/dashboard/ai-chat",
+    exists: true,
   },
 ];
 
@@ -91,62 +97,125 @@ export default function Sidebar() {
 
   return (
     <motion.div
-      className={`bg-[#1a1a1a] text-white h-screen sticky top-0 transition-all duration-300 ${
-        isCollapsed ? "w-16" : "w-64"
+      className={`bg-[#f4f4f4] rounded-2xl text-black h-full border border-gray-200 shadow-lg shadow-black/10 sticky top-0 transition-all duration-300 ${
+        isCollapsed ? "w-[46px]" : "w-64"
       }`}
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      {/* SVG Gradient Definition */}
+      <svg width="0" height="0">
+        <linearGradient id="blue-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop stopColor="#7a6ded" offset="0%" />
+          <stop stopColor="#591885" offset="100%" />
+        </linearGradient>
+        <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop stopColor="#2C6A49" offset="0%" />
+          <stop stopColor="#399E71" offset="100%" />
+        </linearGradient>
+        <linearGradient
+          id="avokago-gradient"
+          x1="100%"
+          y1="100%"
+          x2="0%"
+          y2="0%"
+        >
+          <stop stopColor="#6b9914" offset="0%" />
+          <stop stopColor="#357A38" offset="100%" />
+        </linearGradient>
+        <linearGradient id="gray-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop stopColor="#6b7280" offset="0%" />
+          <stop stopColor="#374151" offset="100%" />
+        </linearGradient>
+      </svg>
       {/* Header */}
-      <div className="p-6 border-b border-gray-700">
+      <div className="px-3 py-4">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-tr from-[#357A38] to-[#568203] rounded-lg flex items-center justify-center">
-                <Drama className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-lg">avokaGo</span>
+              <img
+                src="images/logo.png"
+                alt="avokaGo"
+                className="rounded-lg w-12"
+              />
+              <span className="font-bold text-xl text-black">avokaGo</span>
             </div>
           )}
-          <button
+          <motion.button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded-lg hover:bg-gray-700 transition-colors"
+            className="p-1 rounded-lg hover:bg-gray-200 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ x: 0 }}
+            animate={{ x: isCollapsed ? "-2px" : "0px" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 " />
             ) : (
               <ChevronLeft className="w-4 h-4" />
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
-
       {/* Menu Section */}
-      <div className="px-4 py-6">
+      <div className="py-6">
         {!isCollapsed && (
-          <div className="text-xs uppercase font-semibold text-gray-400 mb-4 px-2">
+          <div className="text-xs uppercase font-semibold text-gray-400 mb-4 px-3.5">
             MENÜ
           </div>
         )}
-        <nav className="space-y-2">
+        <nav className="space-y-2 overflow-hidden">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
+            if (!item.exists) return null;
             return (
               <Link key={item.href} href={item.href}>
                 <motion.div
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all ${
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "bg-[#357A38] text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                      ? "text-gray-800"
+                      : "text-gray-600 hover:text-gray-800"
+                  } `}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <AnimatePresence>
+                    {isActive && !isCollapsed && (
+                      <motion.div
+                        className="absolute left-0 top-1/2 w-2 bg-gradient-to-r to-[#6b9914] from-[#357A38] to-60% rounded-r-full h-full"
+                        initial={{ x: "-10px", y: "-50%", opacity: 0 }}
+                        animate={{ x: 0, y: "-50%", opacity: 1 }}
+                        exit={{ x: "-10px", y: "-50%", opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      ></motion.div>
+                    )}
+                  </AnimatePresence>
+                  <motion.div
+                    initial={{ x: 0 }}
+                    animate={{ x: isActive && !isCollapsed ? "8px" : "0px" }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="flex items-center"
+                  >
+                    <item.icon
+                      className="w-5 h-5"
+                      style={{
+                        stroke: isActive
+                          ? "url(#avokago-gradient)"
+                          : "url(#gray-gradient)",
+                      }}
+                    />
+                  </motion.div>
+
                   {!isCollapsed && (
                     <>
-                      <span className="font-medium">{item.label}</span>
+                      <motion.span
+                        className="font-medium"
+                        initial={{ x: 0 }}
+                        animate={{ x: isActive ? "8px" : "0px" }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      >
+                        {item.label}
+                      </motion.span>
                       {item.badge && (
                         <span className="ml-auto bg-[#568203] text-white text-xs px-2 py-1 rounded-full">
                           {item.badge}
@@ -160,15 +229,14 @@ export default function Sidebar() {
           })}
         </nav>
       </div>
-
       {/* General Section */}
-      <div className="px-4 py-6">
+      <div className="py-6">
         {!isCollapsed && (
-          <div className="text-xs uppercase font-semibold text-gray-400 mb-4 px-2">
+          <div className="text-xs uppercase font-semibold text-gray-400 mb-4 px-3.5">
             GENEL
           </div>
         )}
-        <nav className="space-y-2">
+        <nav className="space-y-2 overflow-hidden">
           {generalItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -176,33 +244,85 @@ export default function Sidebar() {
                 {item.href === "#" ? (
                   <motion.button
                     onClick={() => handleItemClick(item)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all ${
+                    className={`w-full relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                       item.label === "Çıkış Yap"
                         ? "text-red-400 hover:bg-red-500/20"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        : "text-gray-600 hover:text-gray-800"
                     }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                   >
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <motion.div
+                      initial={{ x: 0 }}
+                      animate={{ x: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="flex items-center"
+                    >
+                      <item.icon
+                        className="w-5 h-5"
+                        style={{
+                          stroke:
+                            item.label === "Çıkış Yap"
+                              ? "#ef4444"
+                              : "url(#gray-gradient)",
+                        }}
+                      />
+                    </motion.div>
                     {!isCollapsed && (
-                      <span className="font-medium">{item.label}</span>
+                      <motion.span
+                        className="font-medium"
+                        initial={{ x: 0 }}
+                        animate={{ x: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      >
+                        {item.label}
+                      </motion.span>
                     )}
                   </motion.button>
                 ) : (
                   <Link href={item.href}>
                     <motion.div
-                      className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all ${
+                      className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                         isActive
-                          ? "bg-[#357A38] text-white"
-                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          ? "text-gray-800"
+                          : "text-gray-600 hover:text-gray-800"
                       }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                     >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      <AnimatePresence>
+                        {isActive && !isCollapsed && (
+                          <motion.div
+                            className="absolute left-0 top-1/2 w-2 bg-gradient-to-r to-[#6b9914] from-[#357A38] to-60% rounded-r-full h-full"
+                            initial={{ x: "-10px", y: "-50%", opacity: 0 }}
+                            animate={{ x: 0, y: "-50%", opacity: 1 }}
+                            exit={{ x: "-10px", y: "-50%", opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                          ></motion.div>
+                        )}
+                      </AnimatePresence>
+                      <motion.div
+                        initial={{ x: 0 }}
+                        animate={{
+                          x: isActive && !isCollapsed ? "8px" : "0px",
+                        }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="flex items-center"
+                      >
+                        <item.icon
+                          className="w-5 h-5"
+                          style={{
+                            stroke: isActive
+                              ? "url(#avokago-gradient)"
+                              : "url(#gray-gradient)",
+                          }}
+                        />
+                      </motion.div>
                       {!isCollapsed && (
-                        <span className="font-medium">{item.label}</span>
+                        <motion.span
+                          className="font-medium"
+                          initial={{ x: 0 }}
+                          animate={{ x: isActive ? "8px" : "0px" }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          {item.label}
+                        </motion.span>
                       )}
                     </motion.div>
                   </Link>
@@ -212,36 +332,6 @@ export default function Sidebar() {
           })}
         </nav>
       </div>
-
-      {/* Mobile App Section */}
-      {!isCollapsed && (
-        <div className="absolute bottom-6 left-4 right-4">
-          <motion.div
-            className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="w-12 h-12 bg-gradient-to-tr from-[#357A38] to-[#568203] rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Smartphone className="w-6 h-6 text-white" />
-            </div>
-            <h4 className="font-semibold text-white mb-2">
-              Mobil Uygulamayı İndir
-            </h4>
-            <p className="text-xs text-gray-400 mb-3">
-              Seyahatlerinizi her yerden planlayın!
-            </p>
-            <motion.button
-              className="w-full bg-[#357A38] hover:bg-[#568203] text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Download className="w-4 h-4" />
-              <span>İndir</span>
-            </motion.button>
-          </motion.div>
-        </div>
-      )}
     </motion.div>
   );
 }

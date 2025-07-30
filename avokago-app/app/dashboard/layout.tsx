@@ -8,9 +8,11 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 overflow-auto">{children}</div>
+      <div className="flex h-screen bg-[#FEFDFF]">
+        <div className="p-4">
+          <Sidebar />
+        </div>
+        <div className="flex-1">{children}</div>
       </div>
     </AuthGuard>
   );

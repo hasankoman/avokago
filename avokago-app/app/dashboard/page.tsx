@@ -11,470 +11,650 @@ import {
   MoreVertical,
   Clock,
   CheckCircle,
-  Play,
   Star,
   ArrowUp,
   MapPin,
   Plane,
   Camera,
+  Activity,
+  Target,
+  Globe,
+  Bookmark,
+  ChevronRight,
+  Timer,
+  Map,
+  Heart,
+  Settings,
+  BarChart3,
+  PieChart,
+  LineChart,
+  Mountain,
+  TreePine,
+  Waves,
+  Building,
+  Compass,
+  Tent,
 } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
-import { BarChart, CircularProgress, TimeTracker } from "@/components/Charts";
 
 export default function Dashboard() {
   const { data: session } = useSession();
+  const [selectedProfile, setSelectedProfile] = useState("adventure");
 
-  const stats = [
+  // Dashboard metrics
+  const metrics = [
     {
       title: "Toplam Seyahatler",
       value: "24",
-      icon: "✈️",
-      trend: { value: "2", direction: "up" },
-      color: "bg-[#357A38]",
-    },
-    {
-      title: "Tamamlanan Seyahatler",
-      value: "10",
-      icon: "✅",
-      trend: { value: "Geçen aydan artış", direction: "up" },
-      color: "bg-gray-100",
+      change: "+12%",
+      trend: "up",
+      icon: Globe,
+      gradient: "from-[#357A38] to-[#568203]",
     },
     {
       title: "Aktif Planlar",
-      value: "12",
-      icon: "📋",
-      trend: { value: "Geçen aydan artış", direction: "up" },
-      color: "bg-gray-100",
+      value: "8",
+      change: "+3",
+      trend: "up",
+      icon: Calendar,
+      gradient: "from-blue-500 to-blue-600",
     },
     {
-      title: "Bekleyen Rezervasyonlar",
-      value: "2",
-      icon: "⏳",
-      trend: { value: "Onay Bekliyor", direction: "neutral" },
-      color: "bg-gray-100",
+      title: "Toplam Mesafe",
+      value: "12.5K km",
+      change: "+2.1K",
+      trend: "up",
+      icon: MapPin,
+      gradient: "from-purple-500 to-purple-600",
+    },
+    {
+      title: "Favoriler",
+      value: "47",
+      change: "+5",
+      trend: "up",
+      icon: Heart,
+      gradient: "from-rose-500 to-rose-600",
     },
   ];
 
-  const trips = [
+  // Recent trips
+  const recentTrips = [
     {
-      title: "Kapadokya Balon Turu",
-      date: "20 Kasım 2024",
-      status: "Tamamlandı",
-      members: ["/api/placeholder/32/32", "/api/placeholder/32/32"],
+      id: 1,
+      name: "Kapadokya Gezisi",
       destination: "Nevşehir",
+      date: "20 Nov 2024",
+      status: "completed",
+      progress: 100,
+      participants: 4,
     },
     {
-      title: "Ayder Yaylası Doğa Kampı",
-      date: "25 Kasım 2024",
-      status: "Devam Ediyor",
-      members: ["/api/placeholder/32/32"],
+      id: 2,
+      name: "Ayder Yaylası Kampı",
       destination: "Rize",
+      date: "25 Nov 2024",
+      status: "active",
+      progress: 65,
+      participants: 3,
     },
     {
-      title: "Olimpos Tarih Turu",
-      date: "30 Kasım 2024",
-      status: "Planlandı",
-      members: [
-        "/api/placeholder/32/32",
-        "/api/placeholder/32/32",
-        "/api/placeholder/32/32",
-      ],
+      id: 3,
+      name: "Olimpos Antik Kenti",
       destination: "Antalya",
-    },
-    {
-      title: "Safranbolu Kültür Gezisi",
-      date: "5 Aralık 2024",
-      status: "Planlandı",
-      members: ["/api/placeholder/32/32"],
-      destination: "Karabük",
-    },
-    {
-      title: "Pamukkale Termal Tatili",
-      date: "10 Aralık 2024",
-      status: "Planlandı",
-      members: ["/api/placeholder/32/32", "/api/placeholder/32/32"],
-      destination: "Denizli",
+      date: "30 Nov 2024",
+      status: "planned",
+      progress: 25,
+      participants: 6,
     },
   ];
 
-  const communityMembers = [
+  // Quick actions
+  const quickActions = [
     {
-      name: "Ayşe Kaya",
-      role: "Kapadokya fotoğraflarını paylaştı",
-      status: "Tamamlandı",
-      avatar: "/api/placeholder/40/40",
+      title: "Yeni Seyahat Planla",
+      description: "Bir sonraki macera için plan oluştur",
+      icon: Plus,
+      color: "bg-[#357A38]",
+      hover: "hover:bg-[#568203]",
     },
     {
-      name: "Mehmet Demir",
-      role: "Yeni destinasyon önerisi ekledi",
-      status: "Aktif",
-      avatar: "/api/placeholder/40/40",
+      title: "Destinasyon Keşfet",
+      description: "Yeni yerler ve deneyimler bul",
+      icon: Map,
+      color: "bg-blue-500",
+      hover: "hover:bg-blue-600",
     },
     {
-      name: "Zeynep Arslan",
-      role: "Seyahat planı hazırlığında",
-      status: "Planlıyor",
-      avatar: "/api/placeholder/40/40",
+      title: "Topluluk",
+      description: "Diğer gezginlerle bağlan",
+      icon: Users,
+      color: "bg-purple-500",
+      hover: "hover:bg-purple-600",
     },
     {
-      name: "Can Özkan",
-      role: "Grup seyahati organize ediyor",
-      status: "Aktif",
-      avatar: "/api/placeholder/40/40",
+      title: "AI Asistan",
+      description: "Akıllı seyahat önerileri al",
+      icon: Activity,
+      color: "bg-orange-500",
+      hover: "hover:bg-orange-600",
     },
   ];
+
+  // Profile-based trip recommendations
+  const travelerProfiles = [
+    {
+      id: "adventure",
+      name: "Macera Sevici",
+      description: "Adrenalin ve heyecan dolu deneyimler",
+      icon: Mountain,
+      color: "from-orange-500 to-red-500",
+      bgColor: "bg-orange-50",
+      borderColor: "border-orange-200",
+      recommendations: [
+        {
+          title: "Trekking & Kamp Deneyimi",
+          location: "Kaçkar Dağları, Rize",
+          duration: "3 gün",
+          difficulty: "Zor",
+          price: "2.500₺",
+          image: "/api/placeholder/300/200",
+          features: ["Dağ Tırmanışı", "Kamp", "Doğa Yürüyüşü"],
+        },
+        {
+          title: "Rafting & Zipline Paketi",
+          location: "Köprülü Kanyon, Antalya",
+          duration: "2 gün",
+          difficulty: "Orta",
+          price: "1.800₺",
+          image: "/api/placeholder/300/200",
+          features: ["Rafting", "Zipline", "ATV Safari"],
+        },
+      ],
+    },
+    {
+      id: "cultural",
+      name: "Kültür Meraklısı",
+      description: "Tarih ve kültür keşifleri",
+      icon: Building,
+      color: "from-purple-500 to-indigo-500",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200",
+      recommendations: [
+        {
+          title: "Hitit Medeniyeti Turu",
+          location: "Çorum & Boğazköy",
+          duration: "4 gün",
+          difficulty: "Kolay",
+          price: "3.200₺",
+          image: "/api/placeholder/300/200",
+          features: ["Müze Ziyaretleri", "Antik Şehir", "Rehberli Tur"],
+        },
+        {
+          title: "Osmanlı İzleri",
+          location: "Bursa & İznik",
+          duration: "3 gün",
+          difficulty: "Kolay",
+          price: "2.800₺",
+          image: "/api/placeholder/300/200",
+          features: ["Tarihi Yapılar", "Müze", "Geleneksel Sanatlar"],
+        },
+      ],
+    },
+    {
+      id: "nature",
+      name: "Doğa Sevgisi",
+      description: "Huzur dolu doğa deneyimleri",
+      icon: TreePine,
+      color: "from-green-500 to-teal-500",
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200",
+      recommendations: [
+        {
+          title: "Yedigöller Milli Parkı",
+          location: "Bolu",
+          duration: "2 gün",
+          difficulty: "Kolay",
+          price: "1.500₺",
+          image: "/api/placeholder/300/200",
+          features: ["Doğa Yürüyüşü", "Fotoğrafçılık", "Göl Turu"],
+        },
+        {
+          title: "Kuş Cenneti Keşfi",
+          location: "Bandırma, Balıkesir",
+          duration: "1 gün",
+          difficulty: "Kolay",
+          price: "800₺",
+          image: "/api/placeholder/300/200",
+          features: ["Kuş Gözlemi", "Doğa Fotoğrafçılığı", "Tekne Turu"],
+        },
+      ],
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "active":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "planned":
+        return "bg-orange-100 text-orange-700 border-orange-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "Tamamlandı";
+      case "active":
+        return "Devam Ediyor";
+      case "planned":
+        return "Planlandı";
+      default:
+        return "Bilinmiyor";
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
+    <div className="min-h-screen">
+      <div className="pt-4 pr-4 pb-2">
+        <DashboardHeader />
+      </div>
 
-      <div className="p-6">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600">
-              Seyahatlerinizi planlayın, keşfedin ve deneyimlerinizi paylaşın.
-            </p>
+      <div className="py-6 pr-4 space-y-8">
+        {/* Welcome Section */}
+        <motion.div
+          className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg shadow-black/5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Hoş geldin, {session?.user?.name?.split(" ")[0] || "Gezgin"}!
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Seyahat serüvenine devam etmeye hazır mısın?
+              </p>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#357A38] to-[#568203] rounded-2xl flex items-center justify-center">
+                <Plane className="w-10 h-10 text-white" />
+              </div>
+            </div>
           </div>
-          <div className="flex space-x-3">
-            <motion.button
-              className="bg-[#357A38] text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-[#568203] transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Yeni Seyahat</span>
-            </motion.button>
-            <motion.button
-              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Destinasyon Keşfet
-            </motion.button>
-          </div>
-        </div>
+        </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {metrics.map((metric, index) => (
             <motion.div
-              key={stat.title}
-              className={`${
-                stat.color === "bg-[#357A38]"
-                  ? "bg-[#357A38] text-white"
-                  : "bg-white"
-              } rounded-2xl p-6 border border-gray-200`}
+              key={metric.title}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg shadow-black/5"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              whileHover={{ y: -2, scale: 1.02 }}
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl">{stat.icon}</span>
-                {stat.trend.direction === "up" && (
-                  <ArrowUp
-                    className={`w-4 h-4 ${
-                      stat.color === "bg-[#357A38]"
-                        ? "text-white"
-                        : "text-green-500"
-                    }`}
-                  />
-                )}
-              </div>
-              <div
-                className={`text-3xl font-bold mb-2 ${
-                  stat.color === "bg-[#357A38]" ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {stat.value}
-              </div>
-              <div
-                className={`text-sm ${
-                  stat.color === "bg-[#357A38]"
-                    ? "text-white/80"
-                    : "text-gray-600"
-                }`}
-              >
-                {stat.title}
-              </div>
-              {stat.trend.value !== stat.value && (
                 <div
-                  className={`text-xs mt-2 ${
-                    stat.color === "bg-[#357A38]"
-                      ? "text-white/60"
-                      : "text-gray-500"
-                  }`}
+                  className={`w-12 h-12 bg-gradient-to-r ${metric.gradient} rounded-xl flex items-center justify-center`}
                 >
-                  {stat.trend.value}
+                  <metric.icon className="w-6 h-6 text-white" />
                 </div>
-              )}
+                <div className="flex items-center space-x-1 text-green-600">
+                  <ArrowUp className="w-4 h-4" />
+                  <span className="text-sm font-medium">{metric.change}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {metric.value}
+                </h3>
+                <p className="text-gray-600 text-sm">{metric.title}</p>
+              </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Seyahat İstatistikleri */}
-            <motion.div
-              className="bg-white rounded-2xl p-6 border border-gray-200"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Seyahat İstatistikleri
-                </h3>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <MoreVertical className="w-4 h-4 text-gray-400" />
-                </button>
-              </div>
-              <BarChart />
-            </motion.div>
+        {/* Profile-Based Trip Recommendations */}
+        <motion.div
+          className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg shadow-black/5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Size Özel Öneriler
+            </h2>
+            <p className="text-gray-600">
+              Seyahat tarzınıza göre özenle seçilmiş deneyimler
+            </p>
+          </div>
 
-            {/* Seyahat Planları */}
+          {/* Profile Selector */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            {travelerProfiles.map((profile) => (
+              <motion.button
+                key={profile.id}
+                onClick={() => setSelectedProfile(profile.id)}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all ${
+                  selectedProfile === profile.id
+                    ? `${profile.bgColor} ${profile.borderColor} shadow-md`
+                    : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div
+                  className={`w-10 h-10 bg-gradient-to-r ${profile.color} rounded-lg flex items-center justify-center`}
+                >
+                  <profile.icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold text-gray-900">
+                    {profile.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {profile.description}
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Recommendations */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            {travelerProfiles
+              .find((p) => p.id === selectedProfile)
+              ?.recommendations.map((trip, index) => (
+                <motion.div
+                  key={trip.title}
+                  className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform border border-gray-200 p-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                >
+                  {/* Background Image */}
+                  <div className="relative h-[30rem] overflow-hidden">
+                    {/* Base image (clear) */}
+                    <img
+                      src="https://i.ibb.co/xSG8Lhpb/city-blue-sky.jpg"
+                      alt={trip.title}
+                      className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                    />
+
+                    {/* Smooth blurred overlay for bottom portion */}
+                    <div
+                      className="absolute inset-0 w-full h-full rounded-2xl blur-sm"
+                      style={{
+                        backgroundImage:
+                          'url("https://i.ibb.co/xSG8Lhpb/city-blue-sky.jpg")',
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        maskImage:
+                          "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.2) 35%, transparent 50%)",
+                        WebkitMaskImage:
+                          "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.2) 35%, transparent 50%)",
+                      }}
+                    />
+
+                    {/* Overlay gradiet for text readability */}
+
+                    <div className="absolute top-4 left-4 flex items-center justify-between w-[calc(100%-32px)]">
+                      <div className="flex items-center space-x-4 bg-black/15 backdrop-blur-sm rounded-full p-2 border border-white/20">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                            <Clock className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-white/90">{trip.duration}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                            <Target className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-white/90">
+                            {trip.difficulty}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Heart icon */}
+                      <motion.button
+                        className="w-12 h-12 bg-black/15 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/20 transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Heart className="w-6 h-6 text-white" />
+                      </motion.button>
+                    </div>
+
+                    {/* Content overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-xl font-bold mb-2">{trip.title}</h3>
+                      <p className="text-white/80 mb-4">{trip.location}</p>
+
+                      {/* Trip details */}
+
+                      {/* Price */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-white/70">from</span>
+                          <span className="text-xl font-bold text-white">
+                            {trip.price}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-white/70">
+                          <Plane className="w-4 h-4" />
+                          <span className="text-sm">
+                            {trip.location.split(",")[1]?.trim() || "TUR"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+          </div>
+        </motion.div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Recent Trips */}
+          <div className="lg:col-span-2">
             <motion.div
-              className="bg-white rounded-2xl p-6 border border-gray-200"
-              initial={{ opacity: 0, x: -30 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg shadow-black/5"
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Seyahat Planları
-                </h3>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Son Seyahatler
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Güncel seyahat planların ve geçmiş deneyimlerin
+                  </p>
+                </div>
                 <motion.button
-                  className="text-sm text-[#357A38] hover:text-[#568203] font-medium flex items-center space-x-1"
+                  className="text-[#357A38] hover:text-[#568203] font-medium flex items-center space-x-2"
                   whileHover={{ x: 5 }}
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Yeni Plan</span>
+                  <span>Tümünü Gör</span>
+                  <ChevronRight className="w-4 h-4" />
                 </motion.button>
               </div>
 
               <div className="space-y-4">
-                {trips.map((trip, index) => (
+                {recentTrips.map((trip, index) => (
                   <motion.div
-                    key={index}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-xl transition-colors"
+                    key={trip.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
+                    transition={{ delay: 0.4 + index * 0.1, duration: 0.3 }}
+                    whileHover={{ scale: 1.01 }}
                   >
                     <div className="flex items-center space-x-4">
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          trip.status === "Tamamlandı"
-                            ? "bg-green-500"
-                            : trip.status === "Devam Ediyor"
-                            ? "bg-blue-500"
-                            : "bg-orange-400"
-                        }`}
-                      />
+                      <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-gray-600" />
+                      </div>
                       <div>
-                        <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                          <span>{trip.title}</span>
-                          <MapPin className="w-3 h-3 text-gray-400" />
-                          <span className="text-sm text-gray-500">
-                            {trip.destination}
+                        <h3 className="font-semibold text-gray-900">
+                          {trip.name}
+                        </h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <span className="flex items-center space-x-1">
+                            <MapPin className="w-3 h-3" />
+                            <span>{trip.destination}</span>
                           </span>
-                        </h4>
-                        <p className="text-sm text-gray-500">{trip.date}</p>
+                          <span className="flex items-center space-x-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>{trip.date}</span>
+                          </span>
+                          <span className="flex items-center space-x-1">
+                            <Users className="w-3 h-3" />
+                            <span>{trip.participants}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <div className="flex -space-x-2">
-                        {trip.members.map((member, i) => (
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-900">
+                          {trip.progress}%
+                        </div>
+                        <div className="w-16 h-2 bg-gray-200 rounded-full">
                           <div
-                            key={i}
-                            className="w-8 h-8 bg-gradient-to-br from-[#357A38] to-[#568203] rounded-full border-2 border-white flex items-center justify-center"
-                          >
-                            <span className="text-white text-xs font-semibold">
-                              {String.fromCharCode(65 + i)}
-                            </span>
-                          </div>
-                        ))}
+                            className="h-full bg-gradient-to-r from-[#357A38] to-[#568203] rounded-full"
+                            style={{ width: `${trip.progress}%` }}
+                          />
+                        </div>
                       </div>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          trip.status === "Tamamlandı"
-                            ? "bg-green-100 text-green-700"
-                            : trip.status === "Devam Ediyor"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-orange-100 text-orange-700"
-                        }`}
+                        className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(
+                          trip.status
+                        )}`}
                       >
-                        {trip.status}
+                        {getStatusText(trip.status)}
                       </span>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Topluluk Aktivitesi */}
-            <motion.div
-              className="bg-white rounded-2xl p-6 border border-gray-200"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Topluluk Aktivitesi
-                </h3>
-                <motion.button
-                  className="text-sm text-[#357A38] hover:text-[#568203] font-medium"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Tümünü Gör
-                </motion.button>
-              </div>
-
-              <div className="space-y-4">
-                {communityMembers.map((member, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#357A38] to-[#568203] rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {member.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">
-                        {member.name}
-                      </h4>
-                      <p className="text-sm text-gray-500">{member.role}</p>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        member.status === "Tamamlandı"
-                          ? "bg-green-100 text-green-700"
-                          : member.status === "Aktif"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      {member.status}
-                    </span>
                   </motion.div>
                 ))}
               </div>
             </motion.div>
           </div>
 
-          {/* Right Column */}
+          {/* Right Column - Quick Actions & Stats */}
           <div className="space-y-6">
-            {/* Hatırlatıcılar */}
+            {/* Quick Actions */}
             <motion.div
-              className="bg-white rounded-2xl p-6 border border-gray-200"
-              initial={{ opacity: 0, x: 30 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg shadow-black/5"
+              initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Hızlı İşlemler
+              </h2>
+              <div className="grid grid-cols-1 gap-3">
+                {quickActions.map((action, index) => (
+                  <motion.button
+                    key={action.title}
+                    className={`${action.color} ${action.hover} text-white p-4 rounded-xl transition-colors text-left`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1, duration: 0.3 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <action.icon className="w-6 h-6" />
+                      <div>
+                        <div className="font-medium">{action.title}</div>
+                        <div className="text-sm opacity-90">
+                          {action.description}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Activity Summary */}
+            <motion.div
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg shadow-black/5"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Hatırlatıcılar
-                </h3>
+                <h2 className="text-xl font-bold text-gray-900">Bu Ay</h2>
                 <Calendar className="w-5 h-5 text-gray-400" />
               </div>
 
-              <div className="bg-gradient-to-br from-[#357A38]/10 to-[#568203]/10 rounded-xl p-4 mb-4">
-                <h4 className="font-semibold text-gray-900 mb-2">
-                  Kapadokya Balon Turu
-                </h4>
-                <p className="text-sm text-gray-600 mb-3">
-                  Saat: 05:00 - 08:00
-                </p>
-                <motion.button
-                  className="bg-[#357A38] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#568203] transition-colors flex items-center space-x-2"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Plane className="w-3 h-3" />
-                  <span>Detayları Gör</span>
-                </motion.button>
-              </div>
-            </motion.div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-100">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <span className="text-green-800 font-medium">
+                      Tamamlanan
+                    </span>
+                  </div>
+                  <span className="text-green-800 font-bold">3</span>
+                </div>
 
-            {/* Seyahat İlerlemesi */}
-            <motion.div
-              className="bg-white rounded-2xl p-6 border border-gray-200"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Seyahat İlerlemesi
-                </h3>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <MoreVertical className="w-4 h-4 text-gray-400" />
-                </button>
-              </div>
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-100">
+                  <div className="flex items-center space-x-3">
+                    <Timer className="w-5 h-5 text-blue-600" />
+                    <span className="text-blue-800 font-medium">
+                      Devam Eden
+                    </span>
+                  </div>
+                  <span className="text-blue-800 font-bold">2</span>
+                </div>
 
-              <div className="text-center">
-                <CircularProgress percentage={41} />
-                <div className="mt-4 flex justify-center space-x-6 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-[#357A38] rounded-full" />
-                    <span className="text-gray-600">Tamamlandı</span>
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-xl border border-orange-100">
+                  <div className="flex items-center space-x-3">
+                    <Clock className="w-5 h-5 text-orange-600" />
+                    <span className="text-orange-800 font-medium">
+                      Planlandı
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                    <span className="text-gray-600">Devam Ediyor</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-gray-300 rounded-full" />
-                    <span className="text-gray-600">Planlandı</span>
-                  </div>
+                  <span className="text-orange-800 font-bold">5</span>
                 </div>
               </div>
             </motion.div>
 
-            {/* AI Seyahat Asistanı */}
+            {/* Personal Goals */}
             <motion.div
               className="bg-gradient-to-br from-[#357A38] to-[#568203] rounded-2xl p-6 text-white"
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
             >
               <div className="text-center">
-                <h3 className="text-lg font-semibold mb-4">
-                  AI Seyahat Asistanı
-                </h3>
-                <div className="text-4xl font-bold mb-4">24/7</div>
-                <p className="text-sm text-white/80 mb-4">
-                  Size özel seyahat önerileri
-                </p>
-                <div className="flex justify-center space-x-4">
-                  <motion.button
-                    className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Camera className="w-4 h-4 text-white" />
-                  </motion.button>
-                  <motion.button
-                    className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <MapPin className="w-4 h-4 text-white" />
-                  </motion.button>
+                <Target className="w-12 h-12 mx-auto mb-4 opacity-90" />
+                <h3 className="text-lg font-bold mb-2">2024 Hedefi</h3>
+                <div className="text-3xl font-bold mb-2">15/20</div>
+                <p className="text-white/80 text-sm mb-4">Seyahat tamamlandı</p>
+
+                <div className="w-full bg-white/20 rounded-full h-3 mb-4">
+                  <div
+                    className="bg-white h-full rounded-full"
+                    style={{ width: "75%" }}
+                  ></div>
                 </div>
+
+                <p className="text-white/90 text-sm">
+                  Harika gidiyorsun! 5 seyahat daha kaldı.
+                </p>
               </div>
             </motion.div>
           </div>
