@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* avokaGo Brand Colors */
+  --avokago-green-primary: #357a38;
+  --avokago-green-secondary: #568203;
+  --avokago-green-light: #a7c957;
+  --avokago-yellow: #f0e68c;
+  --avokago-brown: #6b4f1d;
+  --avokago-cream: #f9f9f4;
+
+  /* Background gradients */
+  --background: #f9f9f4;
+  --foreground: #6b4f1d;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--avokago-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--avokago-green-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--avokago-green-primary);
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Button base styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-[#357A38] to-[#568203] text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#357A38]/25 transition-all duration-300 transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-white/80 backdrop-blur-sm text-[#6B4F1D] px-6 py-3 rounded-full font-semibold border border-[#A7C957]/30 hover:bg-white hover:shadow-lg transition-all duration-300;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-[#6B4F1D]/5 border border-[#A7C957]/30 hover:shadow-2xl hover:shadow-[#6B4F1D]/10 transition-all duration-500;
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full p-4 rounded-2xl border border-[#A7C957]/30 bg-white/60 backdrop-blur-sm focus:outline-none focus:border-[#357A38] focus:ring-2 focus:ring-[#357A38]/20 transition-all duration-300;
+}
+
+/* Animation classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Background patterns */
+.bg-pattern {
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      rgba(167, 201, 87, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(53, 122, 56, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(240, 230, 140, 0.1) 0%,
+      transparent 50%
+    );
+}
